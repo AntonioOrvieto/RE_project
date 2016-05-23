@@ -122,10 +122,6 @@ P_m_prev = estState.P_m;
 uv=actuate(1);
 ur=actuate(2);
 
-%Noise matrices
-Q=[estConst.VelocityInputPSD,0;0,estConst.AngleInputPSD];
-R=[estConst.CompassNoise,0;0,estConst.DistNoise];
-
 %B imported
 B=estConst.WheelBase;
 
@@ -179,10 +175,30 @@ P_p = reshape(p_sol(end,:),[4,4]);
 
 %% MEASUREMENT UPDATE STEP
 
+%Noise matrices
+Q=[estConst.VelocityInputPSD,0;0,estConst.AngleInputPSD];
+R=[estConst.CompassNoise,0;0,estConst.DistNoise];
+
 %Measurement
-zd=sense(1);
-zr=sense(2);
+zd=sense(1); %distance measurement
+zr=sense(2); %radius measurement 
 z_m=[zr,zd]; %IS THE ORDER CORRECT?! (I THINK SO)
+
+
+%dealing with infinite measurement
+if(zd == inf)
+    R=[estConst.CompassNoise,0;0,inf];
+end
+
+if(zr == inf)
+    R=[estConst.CompassNoise,0;0,inf];
+end
+
+if and(zr==inf, zd==inf)
+    R=[inf,0;0,inf];
+end
+
+    
 
 M=eye(2);
 H=[0,0,1,0;
