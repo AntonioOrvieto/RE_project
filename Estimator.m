@@ -165,6 +165,9 @@ end
 A = @(t) AA(:,:,2);
 L = @(t) LL(:,:,2);
 
+%Process noise matrix
+Q=[estConst.VelocityInputPSD,0;0,estConst.AngleInputPSD];
+
 %Update function
 up_p = @(t,p) reshape(A(t)*reshape(p,[4,4])+reshape(p,[4,4])*transpose(A(t)) + L(t)*Q*transpose(L(t)), [16,1]);
 
@@ -175,8 +178,7 @@ P_p = reshape(p_sol(end,:),[4,4]);
 
 %% MEASUREMENT UPDATE STEP
 
-%Noise matrices
-Q=[estConst.VelocityInputPSD,0;0,estConst.AngleInputPSD];
+%Measurement noise matrix
 R=[estConst.CompassNoise,0;0,estConst.DistNoise];
 
 %Measurement
